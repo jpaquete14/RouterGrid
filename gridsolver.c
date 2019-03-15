@@ -6,20 +6,67 @@
 
 
 typedef struct graph {
-    int N;  //number of nodes//
+    int N, M;  //number of nodes//
     int** adj_matrix; //adjacency matrix//
 } graph_t;
 
+
+typedef struct node {
+    int value;
+    struct node * next; 
+} node_t;
 
 graph_t * create_graph( int N);
 void add_edge( int i, int j, graph_t * g);
 void delete_edge( int i, int j, graph_t * g);
 void print_graph( graph_t * g);
+void free_graph( graph_t * g);
 
+node_t * create_stack();
+void push(int n, node_t * top);
+int pop( node_t * top);
+
+
+/*=======================================================
+ *Stack functions
+ *=======================================================
+ */
+node_t * create_stack() {
+    node_t * s = NULL;
+    return s;
+}
+
+void push(int n, node_t * top) {
+    node_t * new;
+    new = (node_t *) malloc(sizeof(struct node));
+    new->value = n;
+    new->next = top;
+    top = new; 
+}
+
+
+int pop( node_t * top) {
+    int value;   
+    node_t * old;   
+    if (top != NULL) {     
+        value = top->value;     
+        old = top;     
+        top = top->next;     
+        free(old);     
+        return value;  
+    }   
+    else return -1; 
+}
+
+/* =============================================================================
+ * graph functions
+ * =============================================================================
+ */
 graph_t * create_graph( int N ) {
     int i, j;
     graph_t * g = (graph_t *)malloc(sizeof(graph_t));
     g -> N = N;
+    g -> M = 0;     //Starts with 0 edges//
     g->adj_matrix = (int **)malloc(N * sizeof( int *));
     for(i = 0; i<N; i++){
         g->adj_matrix[i] = (int *)malloc(N * sizeof(int));
@@ -60,6 +107,15 @@ void print_graph( graph_t * g) {
      }
 }
 
+void free_graph( graph_t * g) {
+    int i;
+    for( i = 0; i < g->N; i++) {
+        free( g -> adj_matrix[i]);
+    }
+    free(g -> adj_matrix);
+    free(g);
+}
+
 
 
 int main() {
@@ -72,6 +128,9 @@ int main() {
         add_edge( v1, v2, g);
     }
     print_graph(g);
+
+    free_graph(g);
+    return 0;
     
 }
 

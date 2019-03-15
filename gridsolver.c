@@ -28,15 +28,15 @@ int pop( node_t * top);
 
 
 /*=======================================================
- *Stack functions
+ *list functions
  *=======================================================
  */
-node_t * create_stack() {
+node_t * create_list() {
     node_t * s = NULL;
     return s;
 }
 
-void push(int n, node_t * top) {
+void add(int n, node_t * top) {
     node_t * new;
     new = (node_t *) malloc(sizeof(struct node));
     new->value = n;
@@ -45,7 +45,7 @@ void push(int n, node_t * top) {
 }
 
 
-int pop( node_t * top) {
+int remove( node_t * top) {
     int value;   
     node_t * old;   
     if (top != NULL) {     
@@ -116,6 +116,42 @@ void free_graph( graph_t * g) {
     free(g);
 }
 
+/* =============================================================================
+ * Graph algorithm
+ * =============================================================================
+ */
+
+void rec_tarjan( graph_t * g, int time, int visited[], int u, int d[], int low[], int parent[], node_t * art_pts) {
+    int children = 0;
+    int i;
+    d[u] = low[u] = ++time;
+    visited[u] = 1;
+    for(i = 0; i < g->N; i++) {
+        if(g->adj_matrix[u][i] == 1) {
+            //If the node hasn't been accessed yet
+            if( visited[i] == 0) {
+                children++;
+                parent[i] = u;
+                
+                rec_tarjan(g, time, visited, i, d, low, parent, art_pts);
+
+                low[u] = min(low[u], low[i]);
+                //when root with more than 1 child
+                if(parent[u] == NULL && children > 1) {
+                    add(u, art_pts);
+                }
+                //when not root but low value of child is >= than its discover value
+                if(parent[u] != NULL && low[i] >= d[u]) {
+                    add(u, art_pts);
+                }
+            }
+            //If it isn't the parent node, update low value
+            if( parent[u] != i) {
+                low[u]  = min(low[u], d[i]);
+            }
+        }
+    }
+}
 
 
 int main() {

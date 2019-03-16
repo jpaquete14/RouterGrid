@@ -16,16 +16,22 @@ typedef struct node {
     struct node * next; 
 } node_t;
 
+typedef struct list_node {
+    node_t * list;
+    struct list_node * next;
+} list_node_t;
+
 graph_t * create_graph( int N);
 void add_edge( int i, int j, graph_t * g);
 void delete_edge( int i, int j, graph_t * g);
 void print_graph( graph_t * g);
 void free_graph( graph_t * g);
 
-node_t * create_stack();
-void push(int n, node_t * top);
-int pop( node_t * top);
+node_t * create_list();
+void add(int n, node_t * top);
+int remove( node_t * top);
 
+void add_list( list_node_t * l, node_t * n);
 
 /*=======================================================
  *list functions
@@ -56,6 +62,25 @@ int remove( node_t * top) {
         return value;  
     }   
     else return -1; 
+}
+
+void free_list( node_t * top) {
+    node_t * i;
+    for(i = top; i != NULL; i = i->next) {
+        free(i);
+    }
+}
+
+/*=======================================================
+ *list_node functions
+ *=======================================================
+ */
+
+void add_list(list_node_t * l, node_t * n) {
+    list_node_t * aux;
+    aux->list = n;
+    aux->next = l;
+    l = aux;
 }
 
 /* =============================================================================
@@ -116,12 +141,13 @@ void free_graph( graph_t * g) {
     free(g);
 }
 
+
 /* =============================================================================
  * Graph algorithm
  * =============================================================================
  */
 
-void rec_tarjan( graph_t * g, int time, int visited[], int u, int d[], int low[], int parent[], node_t * art_pts) {
+void rec_tarjan( graph_t * g, int time, int visited[], int u, int d[], int low[], int parent[], node_t * art_pts, list_node_t * comp_list) {
     int children = 0;
     int i;
     d[u] = low[u] = ++time;
@@ -155,15 +181,31 @@ void rec_tarjan( graph_t * g, int time, int visited[], int u, int d[], int low[]
 
 
 int main() {
-    int i, N, M, v1, v2;
+    int i, N, M, v1, v2, time = 0;
+    list_node_t * comp_list     //Saves the graph's separate components
     scanf("%d", &N);
     graph_t * g = create_graph(N);
+    int visited[N], d[N], low[N], parent[N];
+    for ( i = 0; i < N; i++) { 
+        parent[i] = -1; 
+        visited[i] = 0; 
+    } 
+    node_t * art_pts = create_list();   //Saves the articulation points
+    
     scanf("%d", &M);
     for( i = 0; i < M; i++) {
         scanf("%d %d", &v1, &v2);
         add_edge( v1, v2, g);
     }
     print_graph(g);
+
+    rec_tarjan( g, time, visited, 0, d, low, parent, art_pts, comp_list, );
+
+    for(i = 0; i < N; i++) {
+        if(visited[i] == 1) {
+            add(i,)
+        }
+    }
 
     free_graph(g);
     return 0;
